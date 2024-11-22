@@ -5,7 +5,8 @@ class ColorsManager {
       white = Colors.white,
       black = Colors.black,
       darkThemeColor = Colors.yellow,
-      scaffoldBackColor = Color.fromARGB(255, 117, 117, 117),
+      // scaffoldBackColor = Color.fromARGB(255, 117, 117, 117),
+      scaffoldBackColor = Colors.black12,
       primary = Colors.amber,
       grey = Colors.grey;
   // static const Color backgroundColor = Color.fromARGB(255, 117, 117, 117);

@@ -1,45 +1,76 @@
-// ignore_for_file: avoid_print
-
 import 'dart:convert';
 
 import 'package:chess_league/core/class/check_internet.dart';
 import 'package:chess_league/core/class/status_request.dart';
-import 'package:chess_league/core/service/link.dart';
-import 'package:chess_league/model/user_model.dart';
+import 'package:chess_league/core/const_data/app_link.dart';
+import 'package:chess_league/core/service/my_service.dart';
+import 'package:chess_league/core/service/shared_prefrences_keys.dart';
 import 'package:dartz/dartz.dart';
 import 'package:http/http.dart' as http;
 
 class Crud {
-  Future<Either<StatusRequest, Map>> postData(
+  Future<Either<String, Map<String, dynamic>>> postData(
     String linkUrl,
-    Map data,
-    Map<String, String> header,
-  ) async {
+    Map<String, dynamic> data,
+    Map<String, String> headers,
+    bool toSaveToken, {
+    bool isFormData = false,
+    String methodCall = "POST",
+  }) async {
     try {
       if (await checkInternet()) {
-        var response = await http.post(
-          Uri.parse(linkUrl),
-          body: jsonEncode(data),
-          headers: header,
-        );
-        if (response.statusCode == 200 || response.statusCode == 201) {
-          Map resposneBody = jsonDecode(response.body);
-          print(resposneBody);
-          return Right(resposneBody);
+        http.Response response;
+
+        if (isFormData) {
+          // If isFormData is true, use MultipartRequest for form-data
+          var request = http.MultipartRequest(methodCall, Uri.parse(linkUrl));
+          request.fields.addAll(
+              data.map((key, value) => MapEntry(key, value.toString())));
+          request.headers.addAll(headers);
+
+          final streamedResponse = await request.send();
+          response = await http.Response.fromStream(streamedResponse);
         } else {
-          return const Left(StatusRequest.serverFailure);
+          // Otherwise, send as JSON
+          response = await http.post(
+            Uri.parse(linkUrl),
+            body: jsonEncode(data),
+            headers: headers,
+          );
+        }
+
+        var responseBody = jsonDecode(response.body);
+        if (response.statusCode == 200 || response.statusCode == 201) {
+          if (toSaveToken && responseBody?['access_token'] != null) {
+            var token = responseBody['access_token'];
+            await MyService()
+                .storeStringData(SharedPrefrencesKeys.accessToken, token);
+            await MyService().storeStringData(
+              SharedPrefrencesKeys.email,
+              responseBody['user']['email'],
+            );
+            await MyService().setConstantData();
+          }
+
+          return Right(responseBody);
+        } else {
+          var message = responseBody.toString();
+          return Left(message);
         }
       } else {
-        return const Left(StatusRequest.offlineFailure);
+        var message = "Server Offline!";
+
+        return Left(message);
       }
-    } catch (_) {
-      return const Left(StatusRequest.serverFailure);
+    } catch (e) {
+      var message = e.toString();
+
+      return Left(message);
     }
   }
 
   Future<Either<StatusRequest, Map<String, dynamic>>> getData(
     String linkUrl,
-    Map data,
   ) async {
     try {
       if (await checkInternet()) {
@@ -48,13 +79,11 @@ class Crud {
           headers: AppLink().getHeaderToken(),
         );
         Map<String, dynamic> responseBody = jsonDecode(response.body);
-        print("response status code is : ${response.statusCode}");
-        print("response body code is : ${response.body}");
         if (response.statusCode == 200 || response.statusCode == 201) {
-          UserModel.fromJson(response.body);
           return Right(responseBody);
         } else {
-          return const Left(StatusRequest.serverFailure);
+          var message = responseBody['message'];
+          return Left(message);
         }
       } else {
         return const Left(StatusRequest.offlineFailure);

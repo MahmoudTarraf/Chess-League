@@ -1,31 +1,85 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
+// To parse this JSON data, do
+//
+//     final userModel = userModelFromJson(jsonString);
+
 import 'dart:convert';
 
+UserModel userModelFromJson(String str) => UserModel.fromJson(json.decode(str));
+
+String userModelToJson(UserModel data) => json.encode(data.toJson());
+
 class UserModel {
-  final String name;
-  final String job;
-  final int age;
+  final String accessToken;
+  final User user;
 
-  UserModel({required this.name, required this.job, required this.age});
+  UserModel({
+    required this.accessToken,
+    required this.user,
+  });
 
-  Map<String, dynamic> toMap() {
-    return <String, dynamic>{
-      'name': name,
-      'job': job,
-      'age': age,
-    };
-  }
+  UserModel copyWith({
+    String? accessToken,
+    User? user,
+  }) =>
+      UserModel(
+        accessToken: accessToken ?? this.accessToken,
+        user: user ?? this.user,
+      );
 
-  factory UserModel.fromMap(Map<String, dynamic> map) {
-    return UserModel(
-      name: map['name'] as String,
-      job: map['job'] as String,
-      age: map['age'] as int,
-    );
-  }
+  factory UserModel.fromJson(Map<String, dynamic> json) => UserModel(
+        accessToken: json["access_token"],
+        user: User.fromJson(json["user"]),
+      );
 
-  String toJson() => json.encode(toMap());
+  Map<String, dynamic> toJson() => {
+        "access_token": accessToken,
+        "user": user.toJson(),
+      };
+}
 
-  factory UserModel.fromJson(String source) =>
-      UserModel.fromMap(json.decode(source) as Map<String, dynamic>);
+class User {
+  final int id;
+  final String username;
+  final String email;
+  final String? image;
+  final int rating;
+
+  User({
+    required this.id,
+    required this.username,
+    required this.email,
+    required this.image,
+    required this.rating,
+  });
+
+  User copyWith({
+    int? id,
+    String? username,
+    String? email,
+    String? image,
+    int? rating,
+  }) =>
+      User(
+        id: id ?? this.id,
+        username: username ?? this.username,
+        email: email ?? this.email,
+        image: image ?? this.image,
+        rating: rating ?? this.rating,
+      );
+
+  factory User.fromJson(Map<String, dynamic> json) => User(
+        id: json["id"],
+        username: json["username"],
+        email: json["email"],
+        image: json["image"] ?? '',
+        rating: json["rating"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "id": id,
+        "username": username,
+        "email": email,
+        "image": image,
+        "rating": rating,
+      };
 }

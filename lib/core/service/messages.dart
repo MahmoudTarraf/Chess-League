@@ -43,4 +43,17 @@ class Messages {
     );
     return shouldExit; // Return true if the user confirmed to exit
   }
+
+  static getSnackMessage(String title, String subTitle, Color backColor) {
+    Get.snackbar(
+      title,
+      subTitle,
+      snackPosition: SnackPosition.BOTTOM,
+      backgroundColor: backColor,
+      colorText: ColorsManager.white,
+      duration: const Duration(
+        seconds: 3,
+      ),
+    );
+  }
 }

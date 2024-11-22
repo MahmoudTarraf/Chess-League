@@ -14,14 +14,24 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
   await initialService();
-  runApp(const MyApp());
+  final initialRoute = await MyService().getIsLoginKey() == true
+      ? Routes.homeScreen
+      : Routes.landingScreen;
+  runApp(MyApp(
+    initialRoute: initialRoute,
+  ));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp({
+    super.key,
+    required this.initialRoute,
+  });
+  final String? initialRoute;
 
   @override
   Widget build(BuildContext context) {
+    print(initialRoute);
     return ResponsiveSizer(
       builder: (p0, p1, p2) => GetMaterialApp(
         theme: AppTheme.lightTheme,
@@ -29,7 +39,7 @@ class MyApp extends StatelessWidget {
         themeMode: ThemeMode.light,
         initialBinding: InitialBindings(),
         getPages: routes,
-        initialRoute: Routes.homeScreen,
+        initialRoute: initialRoute,
         debugShowCheckedModeBanner: false,
       ),
     );
