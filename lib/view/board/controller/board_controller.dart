@@ -13,9 +13,9 @@ class BoardController extends GetxController {
   final AudioPlayer _audioPlayer = AudioPlayer();
   Color? squareColor;
   bool isPromotionInProgress = false;
-
+  bool isHelpMenuVisible = false;
   ChessPiece? selectedPiece;
-  bool isVsComputer = true; // New flag to enable computer mode
+  bool isVsComputer = true;
 
   List<List<ChessPiece?>> board = InitializeBoard().initializeBoard;
   List<List<int>> validMoves = [];
@@ -28,14 +28,31 @@ class BoardController extends GetxController {
   List<int> whiteKingPosition = [7, 4]; // Starting position for white king
   List<int> blackKingPosition = [0, 4]; // Starting position for black king
   bool checkStatus = false;
-
+  bool isBoardFlipped = false;
   @override
   void onInit() {
     super.onInit();
     InitializeBoard().initializeBoard;
   }
 
-  // Method to play a sound based on action
+  updateisHelpMenuVisible() {
+    isHelpMenuVisible = !isHelpMenuVisible;
+    update();
+  }
+
+  void toggleBoardFlip() {
+    isBoardFlipped = !isBoardFlipped;
+    update(); // Notify the UI to rebuild
+  }
+
+  ChessPiece? getFlippedPiece(int index) {
+    int row = index ~/ 8;
+    int col = index % 8;
+
+    // Get the piece at the flipped position (reverse row)
+    return board[7 - row][col]; // Flip the rows, columns stay the same
+  }
+
   Future<void> playSound(String fileName) async {
     await _audioPlayer.stop(); // Stop any currently playing sound
 

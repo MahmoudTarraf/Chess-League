@@ -12,6 +12,15 @@ class ChessPiece {
     required this.isSelected,
     required this.pieceColor,
   });
+  // Copy constructor to create a copy of the ChessPiece
+  ChessPiece copy() {
+    return ChessPiece(
+      type: type,
+      pieceColor: pieceColor,
+      image: image,
+      isSelected: isSelected,
+    );
+  }
 }
 
 enum PieceType {

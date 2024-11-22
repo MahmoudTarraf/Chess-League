@@ -15,4 +15,5 @@ class AppImages {
   static const whiteKnight = "$rootImages/knight_white.png";
   static const blackBishop = "$rootImages/bishop_black.png";
   static const whiteBishop = "$rootImages/bishop_white.png";
+  static const chessBack = "$rootImages/chess_back.jpeg";
 }
