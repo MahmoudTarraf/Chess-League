@@ -5,7 +5,7 @@ import 'package:chess_league/model/chess_piece.dart';
 import 'package:chess_league/view/board/util/calculate_valid_moves.dart';
 import 'package:chess_league/view/board/widgets/get_piece_image.dart';
 import 'package:chess_league/view/board/widgets/initialize_board.dart';
-import 'package:chess_league/view/computer/controller/computer_controller.dart';
+// import 'package:chess_league/view/computer/controller/computer_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -15,9 +15,9 @@ class BoardController extends GetxController {
   bool isPromotionInProgress = false;
   bool isHelpMenuVisible = false;
   ChessPiece? selectedPiece;
-  bool isVsComputer = true;
-
-  List<List<ChessPiece?>> board = InitializeBoard().initializeBoard;
+  bool isVsComputer = false;
+  bool isVsOpponent = false;
+  List<List<ChessPiece?>> board = InitializeBoard().initializeBoard('');
   List<List<int>> validMoves = [];
 
   int selectedRow = -1;
@@ -25,14 +25,23 @@ class BoardController extends GetxController {
   List<ChessPiece> whitePiecesTaken = [];
   List<ChessPiece> blackPiecesTaken = [];
   bool isWhiteTurn = true;
+  bool isWaitingForOpponentMove = false; // True if waiting for opponent's move
+
   List<int> whiteKingPosition = [7, 4]; // Starting position for white king
   List<int> blackKingPosition = [0, 4]; // Starting position for black king
   bool checkStatus = false;
   bool isBoardFlipped = false;
+  String thisPlayerColor = '';
+  void setTihsPlayerColor(String val) {
+    thisPlayerColor = val;
+    board = InitializeBoard().initializeBoard(thisPlayerColor);
+    update();
+  }
+
   @override
   void onInit() {
     super.onInit();
-    InitializeBoard().initializeBoard;
+    InitializeBoard().initializeBoard(thisPlayerColor);
   }
 
   updateisHelpMenuVisible() {
@@ -144,8 +153,9 @@ class BoardController extends GetxController {
   }
 
   void resetGame() {
-    board = InitializeBoard().initializeBoard;
+    board = InitializeBoard().initializeBoard(thisPlayerColor);
     checkStatus = false;
+    isWaitingForOpponentMove = false;
     whitePiecesTaken.clear();
     blackPiecesTaken.clear();
     whiteKingPosition = [7, 4];
@@ -173,12 +183,10 @@ class BoardController extends GetxController {
 
   void promotePawn(ChessPiece pawn, PieceType newType, int row, int col,
       int originalRow, int originalCol) {
-    // If it's black's turn, automatically promote the pawn to a queen
     if (!selectedPieceColor(pawn)) {
       newType = PieceType.queen; // Automatically promote black pawn to queen
     }
 
-    // Replace the pawn with the selected piece at the new position
     board[row][col] = ChessPiece(
       isSelected: false,
       type: newType,
@@ -186,27 +194,21 @@ class BoardController extends GetxController {
       image: getImageForPiece(newType, selectedPieceColor(pawn)),
     );
 
-    // Clear the original pawn position
     board[originalRow][originalCol] = null;
 
-    // Clear promotion status
     isPromotionInProgress = false;
 
     // Play promotion sound
     playSound(AppStrings.promoteSound);
 
-    // Update the board UI
     update();
 
-    // Switch turn *after* promotion and sound play
     if (!isPromotionInProgress) {
       isWhiteTurn = !isWhiteTurn; // Switch turn after promotion
     }
 
-    // Trigger computer's move if it's now the computer's turn
-    if (isVsComputer && !isWhiteTurn) {
-      Get.find<ComputerController>().makeRandomMove();
-      //isWhiteTurn = !isWhiteTurn; // Correct turn after computer move
-    }
+    // if (isVsComputer && !isWhiteTurn) {
+    //   Get.find<ComputerController>().makeRandomMove();
+    // }
   }
 }

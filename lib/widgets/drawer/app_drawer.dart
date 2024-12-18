@@ -1,6 +1,10 @@
 import 'package:chess_league/core/const_data/app_colors.dart';
 import 'package:chess_league/core/const_data/app_images.dart';
+import 'package:chess_league/core/service/routes.dart';
+import 'package:chess_league/view/auth/user/user_controller.dart';
+import 'package:chess_league/view/profile/screen/profile_main_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
 
 class AppDrawer extends StatelessWidget {
@@ -8,8 +12,9 @@ class AppDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final thisUser = Get.find<UserController>().currentUser!.user;
     return Drawer(
-      backgroundColor: ColorsManager.white,
+      backgroundColor: Colors.white,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -22,8 +27,7 @@ class AppDrawer extends StatelessWidget {
                   shape: BoxShape.circle,
                 ),
                 child: Image.asset(
-                  AppImages.blackBishop,
-                  fit: BoxFit.cover,
+                  AppImages.blackKnight,
                 ),
               ),
               title: Text(
@@ -35,9 +39,9 @@ class AppDrawer extends StatelessWidget {
                 ),
               ),
               subtitle: Text(
-                'James Karl',
+                thisUser.username,
                 style: TextStyle(
-                  fontSize: 17.sp,
+                  fontSize: 20.sp,
                   color: ColorsManager.black,
                   fontWeight: FontWeight.w500,
                 ),
@@ -50,32 +54,10 @@ class AppDrawer extends StatelessWidget {
           drawerItemCreator(
             icon: Icons.home,
             title: "Homepage",
-            function: () {},
-          ),
-          drawerItemCreator(
-            icon: Icons.shopping_cart,
-            title: "Cart",
-            function: () {},
-          ),
-          drawerItemCreator(
-            icon: Icons.payment,
-            title: "Checkout",
-            function: () {},
-          ),
-          drawerItemCreator(
-            icon: Icons.search,
-            title: "Search Products",
-            function: () {},
-          ),
-          drawerItemCreator(
-            icon: Icons.wallet,
-            title: "Wallet",
-            function: () {},
-          ),
-          drawerItemCreator(
-            icon: Icons.list_alt,
-            title: "Orders",
-            function: () {},
+            function: () {
+              Get.toNamed(Routes.homeScreen);
+              Get.back();
+            },
           ),
           drawerItemCreator(
             icon: Icons.message,
@@ -85,33 +67,28 @@ class AppDrawer extends StatelessWidget {
           drawerItemCreator(
             icon: Icons.person,
             title: "Profile",
-            function: () {},
+            function: () => Get.to(() => const ProfileScreen()),
           ),
           drawerItemCreator(
             icon: Icons.settings,
             title: "Settings",
             function: () {},
           ),
-          drawerItemCreator(
-            icon: Icons.point_of_sale,
-            title: "Points",
-            function: () {},
-          ),
           const Divider(
-            color: ColorsManager.grey,
+            color: ColorsManager.backgroundColor,
             thickness: 2,
           ),
           TextButton.icon(
             icon: const Icon(
               Icons.logout,
-              color: ColorsManager.primary,
+              color: Colors.red,
             ),
             onPressed: () {},
             label: Text(
               "Logout",
               style: TextStyle(
                 fontSize: 17.sp,
-                color: ColorsManager.primary,
+                color: Colors.red,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -122,12 +99,13 @@ class AppDrawer extends StatelessWidget {
   }
 }
 
-Widget drawerItemCreator(
-    {required IconData icon,
-    required String title,
-    required Function()? function}) {
+Widget drawerItemCreator({
+  required IconData icon,
+  required String title,
+  required Function()? function,
+}) {
   return GestureDetector(
-    onTap: () => function,
+    onTap: function,
     child: ListTile(
       leading: Icon(icon),
       title: Text(

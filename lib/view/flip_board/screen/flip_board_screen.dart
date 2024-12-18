@@ -19,6 +19,8 @@ class FlipBoardscreen extends StatelessWidget {
         ),
         itemBuilder: (context, index) {
           ChessPiece? piece = controller.getFlippedPiece(index);
+          int row = index ~/ 8;
+          int col = index % 8;
           return ChessPieceCreator(
             piece: piece,
             isWhite: controller.isWhite(index),
@@ -26,6 +28,8 @@ class FlipBoardscreen extends StatelessWidget {
             isValid: false,
             onTap: () {},
             isInCheck: false,
+            col: col,
+            row: row,
           );
         },
         itemCount: 8 * 8,

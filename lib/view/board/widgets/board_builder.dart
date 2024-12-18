@@ -1,5 +1,6 @@
 import 'package:chess_league/core/const_data/app_colors.dart';
 import 'package:chess_league/core/service/messages.dart';
+import 'package:chess_league/view/auth/user/user_controller.dart';
 import 'package:chess_league/view/board/controller/board_controller.dart';
 import 'package:chess_league/view/flip_board/screen/flip_board_screen.dart';
 import 'package:chess_league/view/board/util/player_header.dart';
@@ -14,11 +15,12 @@ class BoardBuilder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final userController = Get.find<UserController>();
     return WillPopScope(
       onWillPop: () async {
         bool shouldExit = await Messages.onWillPop(
           'Leave Game',
-          'If you leave, you will lose this match',
+          'If you leave, you will lose this match.',
         );
 
         if (shouldExit) {
@@ -39,12 +41,14 @@ class BoardBuilder extends StatelessWidget {
                 }
               },
               child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   Expanded(
                     child: PlayerHeader(
                       takenpieces: controller.whitePiecesTaken,
-                      playerName: 'Black Player',
-                      playerRating: '1600',
+                      playerName: userController.opponentUser!.user.username,
+                      playerRating:
+                          userController.opponentUser!.user.rating.toString(),
                     ),
                   ),
                   Text(
@@ -79,6 +83,8 @@ class BoardBuilder extends StatelessWidget {
                                 isValid: isValidMove,
                                 onTap: () => userSelectedPiece(row, col),
                                 isInCheck: isKingInCheck,
+                                row: row,
+                                col: col,
                               );
                             },
                             itemCount: 8 * 8,
@@ -87,8 +93,9 @@ class BoardBuilder extends StatelessWidget {
                   Expanded(
                     child: PlayerHeader(
                       takenpieces: controller.blackPiecesTaken,
-                      playerName: 'White Player',
-                      playerRating: '1500',
+                      playerName: userController.currentUser!.user.username,
+                      playerRating:
+                          userController.currentUser!.user.rating.toString(),
                     ),
                   ),
                 ],

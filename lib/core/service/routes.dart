@@ -6,5 +6,8 @@ class Routes {
   static String loginScreen = '/loginScreen';
   static String landingScreen = '/landingScreen';
   static String playerRatingScreen = '/playerRatingScreen';
-  //========== Other===================
+  //========== Profile===================
+  static String profileScreen = '/profileScreen';
+  // ============== splash screen ================
+  static String splashScreen = '/splashScreen';
 }

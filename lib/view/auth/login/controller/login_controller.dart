@@ -9,7 +9,7 @@ import 'package:chess_league/core/service/messages.dart';
 import 'package:chess_league/core/service/my_service.dart';
 import 'package:chess_league/core/service/routes.dart';
 import 'package:chess_league/model/user_model.dart';
-import 'package:chess_league/view/auth/user_service/user_service.dart';
+import 'package:chess_league/view/auth/user/user_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -83,7 +83,7 @@ class LoginController extends GetxController {
         statusRequest = StatusRequest.success;
         final userModel = userModelFromJson(jsonEncode(responseBody));
 
-        Get.find<UserService>().setUser(userModel);
+        Get.find<UserController>().setUserModel(userModel);
 
         Messages.getSnackMessage(
           'Signup Successful',

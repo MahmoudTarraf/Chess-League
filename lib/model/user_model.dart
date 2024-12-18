@@ -83,3 +83,14 @@ class User {
         "rating": rating,
       };
 }
+
+final UserModel temp = UserModel(
+  accessToken: '',
+  user: User(
+    id: 0,
+    username: '',
+    email: '',
+    image: '',
+    rating: 0,
+  ),
+);

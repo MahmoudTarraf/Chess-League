@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 class MySize {
   //padding and margin
   static const double sm = 8.0;
@@ -14,6 +16,14 @@ class MySize {
   static const double fontSizeMD = 14.0;
   static const double fontSizeLg = 18.0;
   static const double fontSizeXlg = 22.0;
+  static screenHeight(BuildContext context) {
+    return MediaQuery.of(context).size.height;
+  }
+
+  static screenWidth(BuildContext context) {
+    return MediaQuery.of(context).size.width;
+  }
+
   //button size
   //appbar height
   //image size

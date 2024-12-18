@@ -10,7 +10,8 @@ class MyService extends GetxService {
   Future<MyService> init() async {
     sharedPreferences = await SharedPreferences.getInstance();
     if (await getStringData(SharedPrefrencesKeys.accessToken) != null) {
-      ConstData.token = await getStringData(SharedPrefrencesKeys.accessToken);
+      ConstData.accessToken =
+          await getStringData(SharedPrefrencesKeys.accessToken);
     }
     return this;
   }
@@ -40,7 +41,8 @@ class MyService extends GetxService {
   }
 
   Future<void> setConstantData() async {
-    ConstData.token = await getStringData(SharedPrefrencesKeys.accessToken);
+    ConstData.accessToken =
+        await getStringData(SharedPrefrencesKeys.accessToken);
   }
 }
 

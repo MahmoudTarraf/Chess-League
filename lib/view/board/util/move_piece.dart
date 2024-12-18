@@ -1,13 +1,23 @@
+import 'dart:convert';
 import 'package:chess_league/core/const_data/app_strings.dart';
 import 'package:chess_league/model/chess_piece.dart';
 import 'package:chess_league/view/board/controller/board_controller.dart';
 import 'package:chess_league/view/board/util/user_selected_piece.dart';
 import 'package:chess_league/view/board/widgets/promotion.dart';
-import 'package:chess_league/view/computer/controller/computer_controller.dart';
+import 'package:chess_league/view/opponent/controller/opponent_controller.dart';
 import 'package:get/get.dart';
+
+final myChannel = Get.find<OpponentController>().channel;
 
 void movePiece(int newRow, int newCol) {
   final boardController = Get.find<BoardController>();
+
+  // Prevent moves if it's the opponent's turn
+  if (boardController.isVsOpponent && !boardController.isWhiteTurn) {
+    print('is hereeeeeeeee');
+    print("Waiting for opponent's move.");
+    return;
+  }
 
   if (boardController.selectedPiece == null) return;
 
@@ -26,12 +36,11 @@ void movePiece(int newRow, int newCol) {
           boardController.board[capturedPawnRow][newCol];
       boardController.board[capturedPawnRow][newCol] = null;
       if (capturedPiece != null) {
-        boardController.playSound(AppStrings.captureSound); // Capture sound
-        if (boardController.selectedPieceColor(capturedPiece)) {
-          boardController.whitePiecesTaken.add(capturedPiece);
-        } else {
-          boardController.blackPiecesTaken.add(capturedPiece);
-        }
+        boardController.playSound(AppStrings.captureSound);
+        (boardController.selectedPieceColor(capturedPiece)
+                ? boardController.whitePiecesTaken
+                : boardController.blackPiecesTaken)
+            .add(capturedPiece);
       }
     }
 
@@ -48,23 +57,20 @@ void movePiece(int newRow, int newCol) {
         boardController.selectedRow,
         boardController.selectedCol,
       );
-      return; // Wait for promotion to complete
+      return;
     }
   }
 
   // Handle normal piece capture
-  if (boardController.board[newRow][newCol] != null) {
-    ChessPiece? capturedPiece = boardController.board[newRow][newCol];
-    if (capturedPiece != null) {
-      boardController.playSound(AppStrings.captureSound); // Capture sound
-      if (boardController.selectedPieceColor(capturedPiece)) {
-        boardController.whitePiecesTaken.add(capturedPiece);
-      } else {
-        boardController.blackPiecesTaken.add(capturedPiece);
-      }
-    }
+  ChessPiece? capturedPiece = boardController.board[newRow][newCol];
+  if (capturedPiece != null) {
+    boardController.playSound(AppStrings.captureSound);
+    (boardController.selectedPieceColor(capturedPiece)
+            ? boardController.whitePiecesTaken
+            : boardController.blackPiecesTaken)
+        .add(capturedPiece);
   } else {
-    boardController.playSound(AppStrings.moveSound); // Move sound
+    boardController.playSound(AppStrings.moveSound);
   }
 
   // Move the selected piece
@@ -74,34 +80,39 @@ void movePiece(int newRow, int newCol) {
 
   // Update king positions
   if (boardController.selectedPiece!.type == PieceType.king) {
-    if (boardController.selectedPieceColor(boardController.selectedPiece)) {
-      boardController.whiteKingPosition = [newRow, newCol];
-    } else {
-      boardController.blackKingPosition = [newRow, newCol];
-    }
+    (boardController.selectedPieceColor(boardController.selectedPiece)
+            ? boardController.whiteKingPosition
+            : boardController.blackKingPosition)
+        .setAll(0, [newRow, newCol]);
   }
 
-  // Check if the king is in check and play the check sound
+  // Check for check and play sound
   boardController.checkStatus =
       boardController.isKingInCheck(!boardController.isWhiteTurn);
   if (boardController.checkStatus) {
-    boardController.playSound(AppStrings.checkSound); // Check sound
+    boardController.playSound(AppStrings.checkSound);
   }
 
-  // Deselect the piece and update the state
-  deselectPiece();
-
-  // Switch turns only if it's not a promotion
-  if (!boardController.isPromotionInProgress) {
-    // Switch turns
-    boardController.isWhiteTurn = !boardController.isWhiteTurn;
-
-    // If it's the computer's turn, let it make a move
-    if (boardController.isVsComputer && !boardController.isWhiteTurn) {
-      // Make computer move
-      Get.find<ComputerController>().makeRandomMove();
+  // Send move data
+  Map<String, dynamic> moveData = {
+    "action": "move",
+    "move": {
+      "from": [boardController.selectedRow, boardController.selectedCol],
+      "to": [newRow, newCol],
+      "piece": boardController.selectedPiece?.type.toString(),
+      "player": boardController.isWhiteTurn ? "White" : "Black",
     }
+  };
+
+  String moveDataJson = jsonEncode(moveData);
+  myChannel.sink.add(moveDataJson);
+
+  // Switch turn only if no promotion is in progress
+  if (!boardController.isPromotionInProgress) {
+    boardController.isWhiteTurn = !boardController.isWhiteTurn;
   }
 
+  // Deselect piece and update state
+  deselectPiece();
   boardController.updateState();
 }

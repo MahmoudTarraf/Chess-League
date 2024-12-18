@@ -16,7 +16,7 @@ void main() async {
   await initialService();
   final initialRoute = await MyService().getIsLoginKey() == true
       ? Routes.homeScreen
-      : Routes.landingScreen;
+      : Routes.splashScreen;
   runApp(MyApp(
     initialRoute: initialRoute,
   ));
@@ -31,7 +31,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print(initialRoute);
     return ResponsiveSizer(
       builder: (p0, p1, p2) => GetMaterialApp(
         theme: AppTheme.lightTheme,

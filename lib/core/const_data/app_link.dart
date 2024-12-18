@@ -4,9 +4,14 @@ import 'package:chess_league/core/const_data/const_data.dart';
 
 class AppLink {
   // Remote link
-  static String appRoot = "http://192.168.1.4:8000";
+  static String myIp = '192.168.1.2:8000';
+  static String appRoot = "http://$myIp";
   static String signup = "$appRoot/signup";
   static String login = "$appRoot/login";
+  static String getUser = "$appRoot/get_user/";
+  static String roomName = "$appRoot/get_or_create_room/";
+  // channels remote link
+  static String channelsLink = 'ws://$myIp/ws/chess';
 
   // Token link
 
@@ -19,8 +24,8 @@ class AppLink {
 
   Map<String, String> getHeaderToken() {
     Map<String, String> mainHeader = {
-      'Accept': 'application/json',
-      'Authorization': 'Bearer ${ConstData.token}'
+      "Content-Type": "application/json",
+      'Authorization': 'Bearer ${ConstData.accessToken}'
     };
     return mainHeader;
   }

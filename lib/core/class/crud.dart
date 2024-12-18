@@ -69,7 +69,7 @@ class Crud {
     }
   }
 
-  Future<Either<StatusRequest, Map<String, dynamic>>> getData(
+  Future<Either<String, Map<String, dynamic>>> getData(
     String linkUrl,
   ) async {
     try {
@@ -82,14 +82,14 @@ class Crud {
         if (response.statusCode == 200 || response.statusCode == 201) {
           return Right(responseBody);
         } else {
-          var message = responseBody['message'];
-          return Left(message);
+          var message = responseBody;
+          return Left(message.toString());
         }
       } else {
-        return const Left(StatusRequest.offlineFailure);
+        return Left(StatusRequest.offlineFailure.toString());
       }
     } catch (_) {
-      return const Left(StatusRequest.serverFailure);
+      return Left(StatusRequest.serverFailure.toString());
     }
   }
 }
