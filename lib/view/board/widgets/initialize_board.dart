@@ -19,7 +19,6 @@ class InitializeBoard {
       // Black pieces (starting position, mirrored)
       _placeBlackPieces(newBoard);
     } else {
-      print('No color provided');
       return [];
     }
 

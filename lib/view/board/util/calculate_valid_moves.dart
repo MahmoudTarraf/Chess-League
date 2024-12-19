@@ -15,23 +15,26 @@ List<List<int>> calculateRawValidMoves(
 
   // different direction based on the color of the player
   int direction = thisPiece.pieceColor == Colors.white ? -1 : 1;
+
   switch (thisPiece.type) {
     case PieceType.pawn:
-      //pawns can move one square forward
+      // Pawns can move one square forward if the square is empty
       if (boardController.isInBoard(row + direction, col) &&
           board[row + direction][col] == null) {
         candidateMoves.add([row + direction, col]);
       }
-      //pawns can move 2 squares if they are at the initial places
-      if ((row == 1 && !boardController.selectedPieceColor(thisPiece)) ||
-          (row == 6 && boardController.selectedPieceColor(thisPiece))) {
+
+      // Pawns can move two squares forward from their starting position if both squares are empty
+      if ((thisPiece.pieceColor == Colors.white && row == 6) ||
+          (thisPiece.pieceColor == Colors.black && row == 1)) {
         if (boardController.isInBoard(row + 2 * direction, col) &&
             board[row + 2 * direction][col] == null &&
             board[row + direction][col] == null) {
           candidateMoves.add([row + 2 * direction, col]);
         }
       }
-      //pawns can attack diagnolly
+
+      // Pawns can attack diagonally
       if (boardController.isInBoard(row + direction, col - 1) &&
           board[row + direction][col - 1] != null &&
           boardController.selectedPieceColor(board[row + direction][col - 1]) !=
@@ -44,17 +47,17 @@ List<List<int>> calculateRawValidMoves(
               boardController.selectedPieceColor(thisPiece)) {
         candidateMoves.add([row + direction, col + 1]);
       }
-      // En passant check
+
+      // En passant logic
       if (row == 3 || row == 4) {
-        // White pawn on row 4 or black pawn on row 5
-        // Check left and right columns for en passant opportunities
+        // Check for en passant opportunities
         if (boardController.isInBoard(row, col - 1) &&
             board[row][col - 1] != null &&
             board[row][col - 1]!.type == PieceType.pawn &&
             boardController.selectedPieceColor(board[row][col - 1]) !=
                 boardController.selectedPieceColor(thisPiece) &&
             board[row + direction][col - 1] == null) {
-          candidateMoves.add([row + direction, col - 1]); // En passant left
+          candidateMoves.add([row + direction, col - 1]);
         }
         if (boardController.isInBoard(row, col + 1) &&
             board[row][col + 1] != null &&
@@ -62,10 +65,9 @@ List<List<int>> calculateRawValidMoves(
             boardController.selectedPieceColor(board[row][col + 1]) !=
                 boardController.selectedPieceColor(thisPiece) &&
             board[row + direction][col + 1] == null) {
-          candidateMoves.add([row + direction, col + 1]); // En passant right
+          candidateMoves.add([row + direction, col + 1]);
         }
       }
-      //write method enpasent for pawns on the row 4 and row 5 and the other pawn i played 2 squares forward on the first play
       break;
     case PieceType.rook:
       //the rook move horizontally

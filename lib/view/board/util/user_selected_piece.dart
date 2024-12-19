@@ -14,8 +14,11 @@ void userSelectedPiece(int row, int col) {
   }
 
   // Prevent interaction if it's not the player's turn
-  if (!boardController.isWhiteTurn ||
-      boardController.isWaitingForOpponentMove) {
+  bool isPlayerTurn = (boardController.isWhiteTurn &&
+          boardController.thisPlayerColor == 'white') ||
+      (!boardController.isWhiteTurn &&
+          boardController.thisPlayerColor == 'black');
+  if (!isPlayerTurn || boardController.isWaitingForOpponentMove) {
     print("It's not your turn. Waiting for the opponent's move.");
     return;
   }
@@ -24,19 +27,25 @@ void userSelectedPiece(int row, int col) {
 
   // Handle piece selection
   if (boardController.selectedPiece == null && pieceAtPosition != null) {
+    // Ensure the player is selecting their own piece
     if (boardController.selectedPieceColor(pieceAtPosition) ==
         boardController.isWhiteTurn) {
       selectPiece(row, col);
+    } else {
+      print("You cannot select the opponent's pieces.");
     }
   } else if (pieceAtPosition != null &&
       boardController.selectedPieceColor(pieceAtPosition) ==
           boardController.selectedPieceColor(boardController.selectedPiece)) {
+    // Allow re-selection of the same color piece
     selectPiece(row, col);
   } else if (boardController.selectedPiece != null &&
       boardController.validMoves
           .any((move) => move[0] == row && move[1] == col)) {
+    // Allow moving the selected piece if the target position is valid
     movePiece(row, col);
   } else {
+    // Deselect the piece if no valid actions are performed
     deselectPiece();
   }
 

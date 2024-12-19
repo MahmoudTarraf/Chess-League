@@ -23,7 +23,6 @@ Future<String> fetchRoomNameAndAssignColor(
         'time_limit': thisGame.timeControl,
       }),
     );
-
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       final roomName = data['game']['room_name'];
@@ -32,29 +31,21 @@ Future<String> fetchRoomNameAndAssignColor(
       final player1Id = data['game']['player_1'];
       final player2Id = data['game']['player_2'];
 
-      // Assuming ConstData.userId contains the current player's user ID
-      String thisPlayerColor = 'white'; // Default value
-      String thisId =
-          Get.find<UserController>().currentUser!.user.id.toString();
+      String thisPlayerColor = ''; // Default value
+      int thisId = Get.find<UserController>().currentUser!.user.id;
       // Determine the current player's color
       if (player1Id == thisId) {
-        thisPlayerColor = player1Color; // You are player 1
+        thisPlayerColor = player1Color;
       } else if (player2Id == thisId) {
-        thisPlayerColor = player2Color; // You are player 2
+        thisPlayerColor = player2Color;
       }
-
-      print("Room Name: $roomName");
-      print("You are playing as: $thisPlayerColor");
       Get.find<BoardController>().setTihsPlayerColor(thisPlayerColor);
-      // Now you can pass thisPlayerColor to your boardController
-      // Example: BoardController.setPlayerColor(thisPlayerColor);
+
       return roomName;
     } else {
-      print(response.body);
-      return 'error in room name, ';
+      return 'error in room name';
     }
   } catch (e) {
-    print('Error fetching room name: $e');
     rethrow;
   }
 }

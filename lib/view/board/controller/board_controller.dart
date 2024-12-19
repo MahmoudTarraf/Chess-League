@@ -17,7 +17,7 @@ class BoardController extends GetxController {
   ChessPiece? selectedPiece;
   bool isVsComputer = false;
   bool isVsOpponent = false;
-  List<List<ChessPiece?>> board = InitializeBoard().initializeBoard('');
+  late List<List<ChessPiece?>> board;
   List<List<int>> validMoves = [];
 
   int selectedRow = -1;
@@ -36,12 +36,6 @@ class BoardController extends GetxController {
     thisPlayerColor = val;
     board = InitializeBoard().initializeBoard(thisPlayerColor);
     update();
-  }
-
-  @override
-  void onInit() {
-    super.onInit();
-    InitializeBoard().initializeBoard(thisPlayerColor);
   }
 
   updateisHelpMenuVisible() {
